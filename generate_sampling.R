@@ -57,6 +57,9 @@ ecor <- "anmi_ecoregion_single_parts.tif"
 ####### Road network
 road <- "CaminosSecundarios.shp"
 
+####### Road network
+river <- "ANMI_Streams_50_Clip.shp"
+
 ####################################################################################
 #######  Accessibility from road shapefile (distance to road)
 ####################################################################################
@@ -87,6 +90,27 @@ road <- "CaminosSecundarios.shp"
 #                "tmp_previous.tif",
 #                "previous_def.tif"))
 # 
+
+###################################################################################
+######  Distance to river
+###################################################################################
+rivers_dbf <- read.dbf("ANMI_Streams_50_Clip.dbf")
+summary(rivers_dbf)
+system(sprintf("oft-rasterize_attr.py -v %s -i %s -o %s -a %s",
+               "ANMI_Streams_50_Clip.shp",
+               gfcl,
+               "rivers_utm.tif",
+               "Order"
+))
+
+system(sprintf("gdal_proximity.py -ot UInt16 -co COMPRESS=LZW -co BIGTIFF=YES -distunits GEO %s %s",
+               "rivers_utm.tif",
+               "tmp_access.tif"))
+
+system(sprintf("gdal_translate -co COMPRESS=LZW  %s %s",
+               "tmp_access.tif",
+               "rivers_int16.tif"))
+
 # ####################################################################################
 # #######  Restrict the map to the ANMI zones only
 # ####################################################################################
@@ -180,6 +204,7 @@ sp_df@data$anmi   <- extract(raster(anmi),sp_df@coords)
 sp_df@data$ecoreg <- extract(raster(ecor),sp_df@coords)
 sp_df@data$access <- extract(raster("access_int16.tif"),sp_df@coords)
 sp_df@data$prevdf <- extract(raster("previous_def.tif"),sp_df@coords)
+sp_df@data$rivers <- extract(raster("rivers_int16.tif"),sp_df@coords)
 sp_df@data$elevat <- extract(raster(altitude),sp_df@coords)
 sp_df@data$slope  <- extract(raster(slope),sp_df@coords)
 sp_df@data$aspect  <- extract(raster(aspect),sp_df@coords)
@@ -201,13 +226,13 @@ sp_df@data <- cbind(sp_df@data,over(sp_df,readOGR("ARA_ID_SIG.shp"))[,c(2,4,5)])
 df <- sp_df@data
 
 writeOGR(sp_df,"sampling.shp",layer="sampling",driver="ESRI Shapefile",overwrite_layer = T)
-
-names(df) <- c("map_code","anmi_code","ecoreg_code","xcoord","ycoord","dist_road","dist_prevdf","altitude",
+head(df)
+names(df) <- c("map_code","anmi_code","ecoreg_code","xcoord","ycoord","dist_road","dist_prevdf","dist_river","altitude",
                "slope","aspect","point_id","ecoreg_name","anmi_name","cont_treat","cod_otb","map_class","dueno","municipio","comunidad")
 
 df1 <- df[,c("point_id","xcoord","ycoord","map_class","anmi_name","cont_treat",
              "cod_otb","ecoreg_name","dueno","municipio","comunidad",
-             "dist_road","dist_prevdf","altitude","slope","aspect")]
+             "dist_road","dist_river","dist_prevdf","altitude","slope","aspect")]
 
 df1[is.na(df1$aspect),]$aspect <- 0
 df1$loss <- 0
@@ -228,5 +253,5 @@ hist(log(df1[df1$loss == 1,]$dist_road))
 
 summary(df1)
 
-write.csv(df1,"dataset.csv",row.names = F)
+write.csv(df1,"dataset_20170602.csv",row.names = F)
 
