@@ -11,16 +11,16 @@ The following scripts enable to :
 
 ### Implemented on Ubuntu 16.04.3 OS with the following libraries
 
-   Bash 4.3.46
+####    Bash 4.3.46
 
-   Python 2.7.12
+####    Python 2.7.12
 
-   Perl 5.22.1
+####    Perl 5.22.1
 
-   Open Foris Geospatial Toolkit 1.26.6
+####    Open Foris Geospatial Toolkit 1.26.6
 
-	 Orfeo Toolbox 5.8.0
+#### 	  Orfeo Toolbox 5.8.0
 
-   R 3.4.3
+####    R 3.4.3
 
-   Rstudio 1.0.136
+####    Rstudio 1.0.136
