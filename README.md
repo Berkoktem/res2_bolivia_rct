@@ -1,7 +1,14 @@
-## Processing chain Rapid Eye Sentinel2
-RapidEye Sentinel2 processing chain, Bolivia RCT
+### Processing chain to integrate GFC 2000-2016 data 
+The following scripts enable to :
 
-PAPER REFERENCE HERE
+  download and clip the GFC dataset (v1.4) to the area of interest
+   
+  generate a forest change map and prepare an accuracy assessment reference dataset
+  
+  generate a community-level database (wall-to-wall zonal statistics)
+
+  generate a pixel-level database (sampling approach)
+
 ### Tested with the following libraries
 
    Bash 4.3.46
